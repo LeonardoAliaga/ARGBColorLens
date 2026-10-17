@@ -41,5 +41,9 @@
         <codeInsight.lineMarkerProvider
                 language="JAVA"
                 implementationClass="io.github.leonardoaliaga.argbcolorlens.ArgbLineMarkerProvider"/>
+        <editorFactoryMouseMotionListener
+                implementation="io.github.leonardoaliaga.argbcolorlens.ArgbHoverMouseMotionListener"/>
+        <editorFactoryListener
+                implementation="io.github.leonardoaliaga.argbcolorlens.ArgbHoverEditorFactoryListener"/>
     </extensions>
 </idea-plugin>
