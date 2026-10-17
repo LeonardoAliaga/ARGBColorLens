@@ -40,3 +40,10 @@ intellijPlatform {
         token = providers.environmentVariable("PUBLISH_TOKEN")
     }
 }
+
+
+// Gradle 9 requires an explicit producer/consumer relationship for the signed ZIP.
+// The signature verifier reads signPlugin's output and must run after signing.
+tasks.named("verifyPluginSignature") {
+    dependsOn(tasks.named("signPlugin"))
+}
