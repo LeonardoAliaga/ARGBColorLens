@@ -1,5 +1,7 @@
 package io.github.leonardoaliaga.argbcolorlens
 
+import com.intellij.openapi.application.ReadAction
+import com.intellij.openapi.editor.Document
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.editor.EditorFactory
 import com.intellij.openapi.editor.event.EditorFactoryEvent
@@ -12,6 +14,7 @@ import com.intellij.openapi.editor.markup.TextAttributes
 import com.intellij.psi.PsiDocumentManager
 import com.intellij.psi.PsiElement
 import com.intellij.psi.SmartPsiElementPointer
+import com.intellij.openapi.util.TextRange
 import java.awt.Color
 import java.awt.Component
 import java.awt.Font
@@ -38,6 +41,13 @@ internal object ArgbHoverHighlight {
         val highlighter: RangeHighlighter
     )
 
+    /** Safe immutable snapshot: no PSI objects escape a read action. */
+    private data class HoverTarget(
+        val document: Document,
+        val range: TextRange,
+        val color: Color
+    )
+
     private var active: Active? = null
 
     fun show(pointer: SmartPsiElementPointer<out PsiElement>) {
@@ -55,11 +65,20 @@ internal object ArgbHoverHighlight {
             return
         }
 
-        val token = pointer.element ?: return
-        val expression = ArgbPsi.expressionForLeaf(token) ?: return
-        val sourceColor = ArgbPsi.colorOf(expression) ?: return
-        val file = expression.containingFile ?: return
-        val document = PsiDocumentManager.getInstance(expression.project).getDocument(file) ?: return
+        // Being on the Swing EDT is NOT equivalent to having PSI read access
+        // in IntelliJ Platform 2026.2+. Even pointer.element checks PSI validity.
+        // Resolve and snapshot everything from PSI in an explicit read action.
+        val target = ReadAction.compute<HoverTarget?, RuntimeException> {
+            val token = pointer.element ?: return@compute null
+            val expression = ArgbPsi.expressionForLeaf(token) ?: return@compute null
+            val sourceColor = ArgbPsi.colorOf(expression) ?: return@compute null
+            val file = expression.containingFile ?: return@compute null
+            val document = PsiDocumentManager.getInstance(expression.project)
+                .getDocument(file) ?: return@compute null
+            HoverTarget(document, expression.textRange, sourceColor)
+        } ?: return
+
+        val document = target.document
 
         // Do not highlight something in a different editor or an inactive gutter.
         val pointerLocation = try {
@@ -83,7 +102,7 @@ internal object ArgbHoverHighlight {
         } ?: return
 
         val (editor, gutter, point) = hovered
-        val range = expression.textRange
+        val range = target.range
         if (range.isEmpty || range.endOffset > document.textLength) return
 
         val previous = active
@@ -99,7 +118,7 @@ internal object ArgbHoverHighlight {
         clear()
 
         val chosenColor = if (preferences.useSwatchColor) {
-            sourceColor
+            target.color
         } else {
             Color(preferences.customColorArgb, true)
         }
