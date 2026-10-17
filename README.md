@@ -4,7 +4,7 @@
 
 ARGB Color Lens adds a color swatch to the editor gutter for Java literals written as `0xAARRGGBB`, including references to `final` fields initialized with an ARGB literal. You can choose whether to change an individual usage or the original color definition.
 
-[![Version](https://img.shields.io/badge/version-0.4.0-blue)](https://github.com/LeonardoAliaga/ARGBColorLens)
+[![Version](https://img.shields.io/badge/version-0.4.2-blue)](https://github.com/LeonardoAliaga/ARGBColorLens)
 [![License](https://img.shields.io/badge/license-MIT-green)](LICENSE)
 [![IntelliJ](https://img.shields.io/badge/IntelliJ_Platform-2026.2%2B-7F52FF)](https://www.jetbrains.com/idea/)
 
