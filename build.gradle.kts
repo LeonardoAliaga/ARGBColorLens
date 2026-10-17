@@ -19,3 +19,12 @@ dependencies {
         bundledPlugin("com.intellij.java")
     }
 }
+
+intellijPlatform {
+    pluginConfiguration {
+        ideaVersion {
+            // IntelliJ IDEA 2026.2 / branch 262 and newer.
+            sinceBuild = "262"
+        }
+    }
+}

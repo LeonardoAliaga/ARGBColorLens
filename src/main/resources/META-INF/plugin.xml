@@ -1,27 +1,42 @@
-<!-- Plugin Configuration File. Read more: https://plugins.jetbrains.com/docs/intellij/plugin-configuration-file.html -->
 <idea-plugin>
-    <!-- Unique identifier of the plugin. It should be FQN. It cannot be changed between the plugin versions. -->
+    <!-- Permanent plugin ID: do not change it after the first Marketplace release. -->
     <id>io.github.leonardoaliaga.argbcolorlens</id>
+    <name>ARGB Color Lens</name>
+    <vendor url="https://github.com/LeonardoAliaga">Leonardo Aliaga</vendor>
 
-    <!-- Public plugin name should be written in Title Case.
-     Guidelines: https://plugins.jetbrains.com/docs/marketplace/best-practices-for-listing.html#plugin-name -->
-    <name>Argbcolorlens</name>
+    <!-- The release number comes from gradle.properties (version=0.2.0).
+         Gradle's patchPluginXml task inserts it into the packaged descriptor. -->
+    <idea-version since-build="262"/>
 
-    <!-- A displayed Vendor name or Organization ID displayed on the Plugins Page. -->
-    <vendor url="https://www.yourcompany.com">YourCompany</vendor>
-
-    <!-- Description of the plugin displayed on the Plugin Page and IDE Plugin Manager.
-         Guidelines: https://plugins.jetbrains.com/docs/marketplace/best-practices-for-listing.html#plugin-description -->
     <description><![CDATA[
-        Enter short description for your plugin here.<br>
-        <em>most HTML tags may be used</em>
-        ]]></description>
+        <p><b>Preview and edit ARGB colors directly in Java code.</b></p>
+        <p>ARGB Color Lens displays a gutter swatch for eight-digit Java colors
+        (<code>0xAARRGGBB</code>) and for references to <code>final</code> Java
+        fields initialized with a matching hexadecimal literal.</p>
+        <ul>
+          <li><b>Left-click</b> to change only the selected expression.</li>
+          <li><b>Right-click</b> to update the original constant definition.</li>
+          <li>Preview alpha transparency on a checkerboard and edit opacity
+          using IntelliJ IDEA's native color picker.</li>
+        </ul>
+        <p>Supports Java source files in IntelliJ IDEA 2026.2 and newer.
+        Computed and chained color expressions are not supported yet.</p>
+        <p>Open source on <a href="https://github.com/LeonardoAliaga/ARGBColorLens">GitHub</a>.
+        Developer: <a href="https://www.instagram.com/aliaga1924/">@aliaga1924</a>.</p>
+    ]]></description>
 
-    <!-- Product and plugin compatibility requirements.
-         Read more: https://plugins.jetbrains.com/docs/intellij/plugin-compatibility.html -->
+    <change-notes><![CDATA[
+        <p><b>0.2.0 — First public release</b></p>
+        <ul>
+          <li>ARGB previews for literals and directly initialized Java constants.</li>
+          <li>Left-click edits the current use; right-click edits the definition.</li>
+          <li>Transparency checkerboard, opacity support, and native picker.</li>
+          <li>Safer single-step edits after confirmation.</li>
+        </ul>
+    ]]></change-notes>
+
     <depends>com.intellij.java</depends>
 
-    <!-- One custom marker per ARGB expression: no native colorProvider duplicates. -->
     <extensions defaultExtensionNs="com.intellij">
         <codeInsight.lineMarkerProvider
                 language="JAVA"
