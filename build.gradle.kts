@@ -27,4 +27,16 @@ intellijPlatform {
             sinceBuild = "262"
         }
     }
+
+    // Optional, secure publishing configuration for the Marketplace.
+    // The secrets are only available in the protected GitHub Actions job.
+    // Local builds need no credentials.
+    signing {
+        certificateChain = providers.environmentVariable("CERTIFICATE_CHAIN")
+        privateKey = providers.environmentVariable("PRIVATE_KEY")
+        password = providers.environmentVariable("PRIVATE_KEY_PASSWORD")
+    }
+    publishing {
+        token = providers.environmentVariable("PUBLISH_TOKEN")
+    }
 }
