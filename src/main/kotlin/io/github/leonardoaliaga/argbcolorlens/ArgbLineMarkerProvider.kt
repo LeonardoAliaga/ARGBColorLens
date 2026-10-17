@@ -52,7 +52,7 @@ class ArgbLineMarkerProvider : LineMarkerProvider {
             Supplier { "ARGB Color Lens: $hex" }
         ) {
             override fun createGutterRenderer(): GutterIconRenderer =
-                object : LineMarkerGutterIconRenderer<PsiElement>(this) {
+                object : LineMarkerInfo.LineMarkerGutterIconRenderer<PsiElement>(this) {
                     override fun getTooltipText(): String = tooltip
 
                     override fun isNavigateAction(): Boolean = true
