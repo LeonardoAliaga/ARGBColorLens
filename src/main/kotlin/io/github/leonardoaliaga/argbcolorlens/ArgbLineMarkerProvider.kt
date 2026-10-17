@@ -27,23 +27,15 @@ class ArgbLineMarkerProvider : LineMarkerProvider {
         // Mark only leaf nodes to avoid flickering in IntelliJ's two-pass inspection.
         if (element !is PsiJavaToken) return null
 
-        val expression = when {
-            element is PsiIdentifier -> {
-                val reference = element.parent as? PsiReferenceExpression
-                reference?.takeIf {
-                    it.referenceNameElement == element && ArgbPsi.sourceField(it) != null
-                }
-            }
-            else -> element.parent as? PsiLiteralExpression
-        } ?: return null
+        val expression = ArgbPsi.expressionForLeaf(element) ?: return null
 
         val color = ArgbPsi.colorOf(expression) ?: return null
         val hex = "0x%08X".format(color.rgb)
         val definition = expression is PsiReferenceExpression
-        val tooltip = if (definition)
-            "$hex — Izquierdo: este uso; derecho: constante original"
-        else
-            "$hex — Izquierdo o derecho: editar literal"
+        val tooltip = ArgbMessages.message(
+            if (definition) "swatch.reference" else "swatch.literal",
+            hex, expression.text
+        )
 
         val anchor = SmartPointerManager.createPointer(element)
 
@@ -54,7 +46,10 @@ class ArgbLineMarkerProvider : LineMarkerProvider {
         ) {
             override fun createGutterRenderer(): GutterIconRenderer =
                 object : LineMarkerInfo.LineMarkerGutterIconRenderer<PsiElement>(this) {
-                    override fun getTooltipText(): String = tooltip
+                    override fun getTooltipText(): String {
+                        ArgbHoverHighlight.show(anchor)
+                        return tooltip
+                    }
 
                     override fun isNavigateAction(): Boolean = true
 
@@ -78,7 +73,7 @@ private class EditColorAction(
 ) : AnAction() {
     override fun actionPerformed(e: AnActionEvent) {
         val leaf = pointer.element ?: return
-        val expression = expressionAt(leaf) ?: return
+        val expression = ArgbPsi.expressionForLeaf(leaf) ?: return
         val originalColor = ArgbPsi.colorOf(expression) ?: return
         val project = e.project ?: return
 
@@ -86,10 +81,10 @@ private class EditColorAction(
             ?: (e.inputEvent?.source as? Component)
             ?: return
 
-        val title = if (editDefinition && expression is PsiReferenceExpression)
-            "ARGB Color Lens: editar constante original"
-        else
-            "ARGB Color Lens: editar este uso"
+        val title = ArgbMessages.message(
+            if (editDefinition && expression is PsiReferenceExpression)
+                "dialog.edit.definition" else "dialog.edit.usage"
+        )
 
         // IntelliJ treats an EMPTY listener list as the "Copy color" mode.
         // A non-empty listener list enables "Choose" (confirm the selection).
@@ -105,34 +100,25 @@ private class EditColorAction(
 
         // Never use the expression captured before showing the modal dialog.
         val current = pointer.element ?: return
-        val currentExpression = expressionAt(current) ?: return
+        val currentExpression = ArgbPsi.expressionForLeaf(current) ?: return
 
         if (editDefinition && currentExpression is PsiReferenceExpression) {
             val field = ArgbPsi.sourceField(currentExpression) ?: return
             if (!field.isWritable) {
-                Messages.showWarningDialog(project, "La constante es de solo lectura.", "ARGB Color Lens")
+                Messages.showWarningDialog(project, ArgbMessages.message("warning.readonly.definition"), "ARGB Color Lens")
                 return
             }
             ArgbPsi.replaceOriginal(field, selected)
         } else {
             if (!currentExpression.isWritable) {
-                Messages.showWarningDialog(project, "El archivo es de solo lectura.", "ARGB Color Lens")
+                Messages.showWarningDialog(project, ArgbMessages.message("warning.readonly.file"), "ARGB Color Lens")
                 return
             }
             ArgbPsi.replaceColor(currentExpression, selected)
         }
     }
 
-    private fun expressionAt(element: PsiElement): PsiExpression? {
-        if (!element.isValid) return null
-        return when (element) {
-            is PsiIdentifier -> (element.parent as? PsiReferenceExpression)
-                ?.takeIf { it.referenceNameElement == element && ArgbPsi.sourceField(it) != null }
-            is PsiJavaToken -> (element.parent as? PsiLiteralExpression)
-                ?.takeIf { ArgbPsi.colorOf(it) != null }
-            else -> null
-        }
-    }
+
 }
 
 /** Transparency checkerboard + an ARGB overlay with a distinct border. */
