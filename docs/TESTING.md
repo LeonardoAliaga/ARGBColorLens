@@ -1,4 +1,4 @@
-# Manual testing checklist (0.3.0)
+# Manual testing checklist (0.4.0)
 
 Open a **full Java project** inside the sandbox IntelliJ IDEA started by `runIde`.
 
@@ -45,3 +45,19 @@ These manual checks are required; building alone does not confirm the UI works.
 - [ ] Use another locale: plugin-owned text falls back to English.
 - [ ] Left/right click actions still modify only the intended usage/definition, and Cancel does not change code.
 - [ ] Repeated hover/edit/undo does not produce invalid PSI exceptions, leaks, or a highlight that remains after closing an editor.
+
+## Settings and tooltips (0.4.0)
+
+- [ ] Settings → Tools → ARGB Color Lens appears in a project and in application settings.
+- [ ] Uncheck **Highlight the source expression on gutter swatch hover**, click Apply: the previous highlight disappears and subsequent hovers do not highlight source text; both click actions still work.
+- [ ] Re-enable highlighting and disable **Use the corresponding ARGB swatch color**. Choose a custom color, click Apply, and verify the source highlight uses that shade.
+- [ ] Choose **Use the corresponding ARGB swatch color**, click Apply. Hover distinctly colored swatches and verify that each expression highlights with a matching tint.
+- [ ] With a fully transparent literal `0x00000000`, the highlight remains visible enough to identify the source expression.
+- [ ] With either mode selected, the highlight is removed on mouse exit and is never written into the Java source.
+- [ ] Apply settings, restart IntelliJ, and confirm they persist across projects and IDE restarts.
+- [ ] Change settings then press Cancel: the previous saved settings remain active.
+- [ ] In Settings, **Reset** restores the persisted values; the custom chooser is disabled in automatic-color mode.
+- [ ] Hover a reference such as `UiTheme.TEXT_PRIMARY`: tooltip contains both its color value and symbolic reference.
+- [ ] Hover a direct hexadecimal literal: tooltip contains the value once, not as `0xFF212121 — 0xFF212121`.
+- [ ] Verify the Settings labels and tooltip behavior in both English and Spanish IDE locales.
+- [ ] Confirm left-click / right-click color editing is unaffected.
