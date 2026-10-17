@@ -4,8 +4,6 @@ import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.editor.EditorFactory
 import com.intellij.openapi.editor.event.EditorFactoryEvent
 import com.intellij.openapi.editor.event.EditorFactoryListener
-import com.intellij.openapi.editor.event.EditorMouseEvent
-import com.intellij.openapi.editor.event.EditorMouseMotionListener
 import com.intellij.openapi.editor.markup.EffectType
 import com.intellij.openapi.editor.markup.HighlighterLayer
 import com.intellij.openapi.editor.markup.HighlighterTargetArea
@@ -23,31 +21,41 @@ import java.awt.Point
 import java.awt.event.MouseAdapter
 import java.awt.event.MouseEvent
 import javax.swing.SwingUtilities
+import kotlin.math.abs
 
 /**
- * Highlights precisely the Java expression behind the currently hovered
- * gutter swatch. Never changes Java source code or keeps raw PSI across edits.
+ * Temporary expression highlight for a hovered ARGB gutter icon.
+ *
+ * The tooltip callback may run off the Swing EDT. We therefore schedule the
+ * PSI lookup and editor markup operations on the EDT, where the gutter can
+ * also be checked against the current mouse location.
  */
 internal object ArgbHoverHighlight {
     private data class Active(
         val editor: Editor,
         val gutter: Component,
-        val point: Point,
-        val marker: RangeHighlighter
+        val hoverPoint: Point,
+        val highlighter: RangeHighlighter
     )
 
     private var active: Active? = null
 
-    /** Called when the native gutter requests the tooltip for a swatch. */
     fun show(pointer: SmartPsiElementPointer<out PsiElement>) {
-        if (!SwingUtilities.isEventDispatchThread()) return
+        if (SwingUtilities.isEventDispatchThread()) {
+            showOnEdt(pointer)
+        } else {
+            SwingUtilities.invokeLater { showOnEdt(pointer) }
+        }
+    }
 
+    private fun showOnEdt(pointer: SmartPsiElementPointer<out PsiElement>) {
         val token = pointer.element ?: return
         val expression = ArgbPsi.expressionForLeaf(token) ?: return
         val file = expression.containingFile ?: return
-        val document = PsiDocumentManager.getInstance(expression.project)
-            .getDocument(file) ?: return
-        val mouse = try {
+        val document = PsiDocumentManager.getInstance(expression.project).getDocument(file) ?: return
+
+        // Do not highlight something in a different editor or an inactive gutter.
+        val pointerLocation = try {
             MouseInfo.getPointerInfo()?.location
         } catch (_: Exception) {
             null
@@ -57,70 +65,79 @@ internal object ArgbHoverHighlight {
             if (editor.document !== document) return@firstNotNullOfOrNull null
             val gutter = editor.gutter as? Component ?: return@firstNotNullOfOrNull null
             if (!gutter.isShowing) return@firstNotNullOfOrNull null
-            val relative = Point(mouse)
+
+            val localPoint = Point(pointerLocation)
             try {
-                SwingUtilities.convertPointFromScreen(relative, gutter)
+                SwingUtilities.convertPointFromScreen(localPoint, gutter)
             } catch (_: IllegalComponentStateException) {
                 return@firstNotNullOfOrNull null
             }
-            if (gutter.contains(relative)) Triple(editor, gutter, relative) else null
+            if (gutter.contains(localPoint)) Triple(editor, gutter, localPoint) else null
         } ?: return
 
         val (editor, gutter, point) = hovered
         val range = expression.textRange
         if (range.isEmpty || range.endOffset > document.textLength) return
 
-        val old = active
-        if (old != null && old.editor === editor && old.marker.isValid &&
-            old.marker.startOffset == range.startOffset && old.marker.endOffset == range.endOffset) {
-            active = old.copy(point = point)
+        val previous = active
+        if (previous != null &&
+            previous.editor === editor &&
+            previous.highlighter.isValid &&
+            previous.highlighter.startOffset == range.startOffset &&
+            previous.highlighter.endOffset == range.endOffset) {
+            active = previous.copy(hoverPoint = point)
             return
         }
+
         clear()
 
-        val attrs = TextAttributes(
+        val attributes = TextAttributes(
             null,
-            JBColor(0xD8F1FF, 0x284A5A),
-            JBColor(0x358ABB, 0x70C8FF),
+            JBColor(0xB9E7FA, 0x365568),
+            JBColor(0x178BB9, 0x81D8FF),
             EffectType.ROUNDED_BOX,
             Font.PLAIN
         )
-        val marker = editor.markupModel.addRangeHighlighter(
-            range.startOffset, range.endOffset, HighlighterLayer.SELECTION - 1,
-            attrs, HighlighterTargetArea.EXACT_RANGE
+        val highlighter = editor.markupModel.addRangeHighlighter(
+            range.startOffset,
+            range.endOffset,
+            HighlighterLayer.SELECTION - 1,
+            attributes,
+            HighlighterTargetArea.EXACT_RANGE
         )
-        active = Active(editor, gutter, point, marker)
+        active = Active(editor, gutter, point, highlighter)
     }
 
-    /** Detect leaving the current swatch without tracking any PSI elements. */
-    fun mouseMoved(event: EditorMouseEvent) {
+    /**
+     * A gutter Swing mouse listener receives actual gutter mouse events.
+     * EditorMouseMotionListener alone does not reliably see these events.
+     */
+    fun onGutterMouseMoved(editor: Editor, event: MouseEvent) {
         val item = active ?: return
-        val mouse = event.mouseEvent
-        if (event.editor !== item.editor || mouse.component !== item.gutter ||
-            kotlin.math.abs(mouse.x - item.point.x) > 10 ||
-            kotlin.math.abs(mouse.y - item.point.y) > 10) {
+        if (item.editor !== editor ||
+            event.component !== item.gutter ||
+            abs(event.x - item.hoverPoint.x) > 9 ||
+            abs(event.y - item.hoverPoint.y) > 9) {
             clear()
         }
     }
 
     fun clear(editor: Editor? = null) {
+        if (!SwingUtilities.isEventDispatchThread()) {
+            SwingUtilities.invokeLater { clear(editor) }
+            return
+        }
+
         val item = active ?: return
-        if (editor != null && editor !== item.editor) return
+        if (editor != null && item.editor !== editor) return
         active = null
-        if (item.marker.isValid) {
-            item.editor.markupModel.removeHighlighter(item.marker)
+        if (item.highlighter.isValid) {
+            item.editor.markupModel.removeHighlighter(item.highlighter)
         }
     }
 }
 
-/** Application-wide editor motion callback provided by the IntelliJ platform. */
-class ArgbHoverMouseMotionListener : EditorMouseMotionListener {
-    override fun mouseMoved(e: EditorMouseEvent) {
-        ArgbHoverHighlight.mouseMoved(e)
-    }
-}
-
-/** Clear the transient marker when leaving a gutter or releasing an editor. */
+/** The gutter is a Swing component with its own mouse events. */
 class ArgbHoverEditorFactoryListener : EditorFactoryListener {
     private val listeners = mutableMapOf<Editor, MouseAdapter>()
 
@@ -128,19 +145,26 @@ class ArgbHoverEditorFactoryListener : EditorFactoryListener {
         val editor = event.editor
         val gutter = editor.gutter as? Component ?: return
         val listener = object : MouseAdapter() {
+            override fun mouseMoved(e: MouseEvent) {
+                ArgbHoverHighlight.onGutterMouseMoved(editor, e)
+            }
+
             override fun mouseExited(e: MouseEvent) {
                 ArgbHoverHighlight.clear(editor)
             }
         }
+        gutter.addMouseMotionListener(listener)
         gutter.addMouseListener(listener)
         listeners[editor] = listener
     }
 
     override fun editorReleased(event: EditorFactoryEvent) {
         val editor = event.editor
+        val gutter = editor.gutter as? Component
         val listener = listeners.remove(editor)
         if (listener != null) {
-            (editor.gutter as? Component)?.removeMouseListener(listener)
+            gutter?.removeMouseMotionListener(listener)
+            gutter?.removeMouseListener(listener)
         }
         ArgbHoverHighlight.clear(editor)
     }
