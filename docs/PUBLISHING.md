@@ -4,7 +4,7 @@ This project targets **IntelliJ IDEA 2026.2+ / IntelliJ Platform build 262+**, i
 
 ## Before publishing
 
-1. Confirm that the `main` branch contains version **0.4.0** and that its CI build is green.
+1. Confirm that the `main` branch contains version **0.4.1** and that its CI build is green.
 2. Run `compileKotlin`, `check`, `buildPlugin`, and `verifyPlugin` using JDK **25**.
 3. Run `runIde` and complete the [manual test checklist](TESTING.md), including the distinction between left and right click and Cancel behavior.
 4. Inspect the generated `build/distributions/*.zip`, including the packaged `META-INF/plugin.xml`, plugin name/version/vendor and icon.
@@ -108,14 +108,16 @@ uploads are skipped. When enabled, the workflow calls `signPlugin`,
 `verifyPluginSignature`, and `publishPlugin` for each **newly tagged** version
 only. The Marketplace may still review an upload before it is publicly visible.
 
-### Publishing the current version after enabling secrets
+### Publishing v0.4.1 after enabling secrets
 
-If GitHub already created tag `v0.4.0` before secrets were configured, the next
-source-only push will **not** republish the same version. Instead, in GitHub
-Actions → **Release Plugin** → Run workflow, choose branch `main` and set
-**Publish this version to JetBrains Marketplace** to `true`. The manual retry
-does not recreate the existing GitHub Release. Avoid retrying after a successful
-Marketplace upload, because JetBrains rejects duplicate version numbers.
+The `v0.4.0` tag was created before signing CI fixes and must remain immutable.
+Release `v0.4.1` from a new commit including those fixes. When `MARKETPLACE_AUTO_PUBLISH`
+is `true` at merge time, the `main` push can publish that new version automatically
+following the GitHub Release. Otherwise, after the GitHub Release is created,
+in GitHub Actions → **Release Plugin** → Run workflow, choose branch `main` and set
+**Publish this version to JetBrains Marketplace** to `true`.
+Avoid retrying after a successful Marketplace upload, because JetBrains rejects
+duplicate version numbers.
 
 For the next update, increment `gradle.properties`, update the changelog and
 `plugin.xml` release notes, test it, and merge into `main`. The automation
