@@ -32,13 +32,17 @@ class ArgbLineMarkerProvider : LineMarkerProvider {
         val color = ArgbPsi.colorOf(expression) ?: return null
         val hex = "0x%08X".format(color.rgb)
         val definition = expression is PsiReferenceExpression
-        // Only symbolic references need their source name; literals already
-        // display their hexadecimal value once without duplication.
-        val tooltip = if (definition) {
+        // Preserve the detailed color/source context only when source highlighting
+        // is disabled. While highlighted, the expression itself already identifies
+        // the swatch, so a compact tooltip avoids covering the editor line.
+        val expandedTooltip = if (definition) {
             ArgbMessages.message("swatch.reference", hex, expression.text)
         } else {
             ArgbMessages.message("swatch.literal", hex)
         }
+        val compactTooltip = ArgbMessages.message(
+            if (definition) "swatch.reference.compact" else "swatch.literal.compact"
+        )
 
         val anchor = SmartPointerManager.createPointer(element)
 
@@ -51,7 +55,11 @@ class ArgbLineMarkerProvider : LineMarkerProvider {
                 object : LineMarkerInfo.LineMarkerGutterIconRenderer<PsiElement>(this) {
                     override fun getTooltipText(): String {
                         ArgbHoverHighlight.show(anchor)
-                        return tooltip
+                        return if (ArgbHighlightSettings.getInstance().snapshot().enabled) {
+                            compactTooltip
+                        } else {
+                            expandedTooltip
+                        }
                     }
 
                     override fun isNavigateAction(): Boolean = true

@@ -57,8 +57,11 @@ These manual checks are required; building alone does not confirm the UI works.
 - [ ] Apply settings, restart IntelliJ, and confirm they persist across projects and IDE restarts.
 - [ ] Change settings then press Cancel: the previous saved settings remain active.
 - [ ] In Settings, **Reset** restores the persisted values; the custom chooser is disabled in automatic-color mode.
-- [ ] Hover a reference such as `UiTheme.TEXT_PRIMARY`: tooltip contains both its color value and symbolic reference.
-- [ ] Hover a direct hexadecimal literal: tooltip contains the value once, not as `0xFF212121 — 0xFF212121`.
+- [ ] With hover highlighting **enabled**, hover a reference such as `UiTheme.TEXT_PRIMARY`: its source expression is highlighted, and the compact tooltip displays click actions **without** the ARGB value or reference name.
+- [ ] With hover highlighting **enabled**, hover a direct hexadecimal literal: its source expression is highlighted, and the compact tooltip displays click actions **without** a hexadecimal label.
+- [ ] Disable hover highlighting and click Apply: a reference such as `UiTheme.TEXT_PRIMARY` has a detailed tooltip showing both its ARGB value and symbolic reference.
+- [ ] With highlighting disabled, hover a literal: its tooltip contains its hexadecimal value once, not as `0xFF212121 — 0xFF212121`.
+- [ ] Toggle highlighting back on with Apply and verify the tooltip switches to compact mode without restarting the IDE.
 - [ ] Verify the Settings labels and tooltip behavior in both English and Spanish IDE locales.
 - [ ] Confirm left-click / right-click color editing is unaffected.
 

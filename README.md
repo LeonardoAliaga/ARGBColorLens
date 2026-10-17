@@ -12,7 +12,7 @@ ARGB Color Lens adds a color swatch to the editor gutter for Java literals writt
 
 - **ARGB previews:** gutter swatches for `0xAARRGGBB` values in Java, including the alpha (transparency) channel.
 - **Configurable hover highlighting:** optionally disable highlighting, select a custom highlight color, or match each color swatch automatically. Settings persist across IDE restarts.
-- **Cleaner tooltips:** a Java constant reference such as `UiTheme.TEXT_PRIMARY` shows its symbolic name alongside the ARGB value; a literal such as `0xFF212121` displays its ARGB value only once.
+- **Context-sensitive tooltips:** with hover highlighting enabled, the tooltip stays short and shows only mouse-action hints, without hexadecimal values or source expressions. With highlighting disabled, it shows the ARGB value and the symbolic name for references such as `UiTheme.TEXT_PRIMARY`; literals are shown only once.
 - **Automatic localization:** English is the default; Spanish is used automatically when the IDE language is Spanish. Other languages fall back to English.
 - **Reference awareness:** resolves usages such as `UiTheme.TEXT_PRIMARY` when the referenced `final` field has a direct ARGB literal initializer.
 - **Left-click — local edit:** choose a color and replace only that expression with an ARGB literal.
@@ -51,7 +51,7 @@ Open **Settings → Tools → ARGB Color Lens** (on macOS: **Preferences → Too
 - **Use the corresponding ARGB swatch color** — automatically derives the highlight from each color swatch, including constants such as `UiTheme.TEXT_PRIMARY`.
 - **Custom highlight color** — when the automatic checkbox is off, select a specific color using IntelliJ's native color chooser.
 
-Changes take effect when you click **Apply** or **OK**, without restarting the IDE. A subtle background and outline are blended with the editor theme for legibility; the highlight uses the swatch RGB channels even if the original ARGB alpha is fully transparent.
+Changes take effect when you click **Apply** or **OK**, without restarting the IDE. With highlighting enabled, hover tooltips omit ARGB values and source expressions to stay compact; disabling highlighting restores those details. A subtle background and outline are blended with the editor theme for legibility; the highlight uses the swatch RGB channels even if the original ARGB alpha is fully transparent.
 
 ## Compatibility and limitations
 
@@ -95,7 +95,7 @@ Test changes inside the **sandbox IDE** opened by `runIde` before installing the
 - **Clic derecho:** modifica el color original de la constante.
 - **Hover:** resalta temporalmente la expresión Java correspondiente; puede desactivarse y personalizarse su color desde **Settings → Tools → ARGB Color Lens**.
 - **Idioma:** la interfaz del plugin se adapta automáticamente al inglés o español del IDE.
-- **Tooltips:** muestran el nombre de una constante como `UiTheme.TEXT_PRIMARY`, pero no repiten los literales ARGB.
+- **Tooltips:** con el resaltado activado solo muestran indicaciones breves de los clics. Al desactivar el resaltado vuelven a mostrar el ARGB y, si corresponde, la referencia como `UiTheme.TEXT_PRIMARY`, sin repetir los literales.
 - Se conserva la transparencia ARGB y se utiliza el selector de colores de IntelliJ.
 
 La versión **0.4.0** incorpora la configuración de resaltado y mejoras en los tooltips. La **0.3.0** incorporó el hover y la traducción inglés/español. Consulta [CHANGELOG.md](CHANGELOG.md) para conocer los cambios.

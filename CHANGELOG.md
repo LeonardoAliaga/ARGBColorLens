@@ -20,6 +20,7 @@ The project uses [Semantic Versioning](https://semver.org/).
 - Perform hover smart-pointer, Java PSI, and document resolution inside an explicit read action, fixing `Read access is allowed from inside read-action only` exceptions in IntelliJ 2026.2+.
 
 ### Changed
+- Hover tooltips now omit color values and source expressions while text highlighting is enabled; disabling highlighting restores the descriptive ARGB/reference labels.
 - Tooltip labels show symbolic Java constant names only for references and do not duplicate literal hexadecimal values.
 - Highlight backgrounds blend with the IDE theme for readability, even for fully transparent ARGB swatches.
 - New settings and explanatory text are translated into English and Spanish.
