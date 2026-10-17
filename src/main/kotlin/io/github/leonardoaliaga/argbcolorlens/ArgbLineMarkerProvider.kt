@@ -81,8 +81,9 @@ private class EditColorAction(
         val originalColor = ArgbPsi.colorOf(expression) ?: return
         val project = e.project ?: return
 
-        val parent: Component? = e.getData(CommonDataKeys.EDITOR)?.contentComponent
-            ?: e.inputEvent?.source as? Component
+        val parent: Component = e.getData(CommonDataKeys.EDITOR)?.contentComponent
+            ?: (e.inputEvent?.source as? Component)
+            ?: return
 
         val title = if (editDefinition && expression is PsiReferenceExpression)
             "ARGB Color Lens: editar constante original"
