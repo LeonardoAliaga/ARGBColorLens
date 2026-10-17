@@ -61,3 +61,10 @@ These manual checks are required; building alone does not confirm the UI works.
 - [ ] Hover a direct hexadecimal literal: tooltip contains the value once, not as `0xFF212121 — 0xFF212121`.
 - [ ] Verify the Settings labels and tooltip behavior in both English and Spanish IDE locales.
 - [ ] Confirm left-click / right-click color editing is unaffected.
+
+## Hover read-access regression (v0.4.0)
+
+- [ ] Hover literal and constant swatches repeatedly without a `Read access is allowed from inside read-action only` error in `idea.log`.
+- [ ] Switch between Java tabs and hover immediately after opening a file; no `PsiInvalidElementAccessException` occurs.
+- [ ] Highlight remains temporary and disappears on gutter mouse exit.
+- [ ] Switching custom/matching highlight modes, disabling hover highlighting, and both color edit buttons still work.

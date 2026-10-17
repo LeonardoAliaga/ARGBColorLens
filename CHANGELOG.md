@@ -16,6 +16,9 @@ The project uses [Semantic Versioning](https://semver.org/).
 - Application-wide persistent option to enable or disable the hover expression highlight.
 - Custom highlight color picker and an option to derive the highlight from each swatch.
 
+### Fixed
+- Perform hover smart-pointer, Java PSI, and document resolution inside an explicit read action, fixing `Read access is allowed from inside read-action only` exceptions in IntelliJ 2026.2+.
+
 ### Changed
 - Tooltip labels show symbolic Java constant names only for references and do not duplicate literal hexadecimal values.
 - Highlight backgrounds blend with the IDE theme for readability, even for fully transparent ARGB swatches.
