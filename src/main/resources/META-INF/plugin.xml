@@ -4,7 +4,7 @@
     <name>ARGB Color Lens</name>
     <vendor url="https://github.com/LeonardoAliaga">Leonardo Aliaga</vendor>
 
-    <!-- The release number comes from gradle.properties (version=0.3.0).
+    <!-- The release number comes from gradle.properties (version=0.4.0).
          Gradle's patchPluginXml task inserts it into the packaged descriptor. -->
     <idea-version since-build="262"/>
 
@@ -14,7 +14,7 @@
         (<code>0xAARRGGBB</code>) and for references to <code>final</code> Java
         fields initialized with a matching hexadecimal literal.</p>
         <ul>
-          <li><b>Hover</b> to highlight the expression associated with a swatch.</li>
+          <li><b>Hover</b> to highlight a swatch's expression; customize or disable its color in Settings.</li>
           <li><b>Left-click</b> to change only the selected expression.</li>
           <li><b>Right-click</b> to update the original constant definition.</li>
           <li>Preview alpha transparency on a checkerboard and edit opacity
@@ -27,14 +27,13 @@
     ]]></description>
 
     <change-notes><![CDATA[
-        <p><b>0.3.0 — Hover highlights and localization</b></p>
+        <p><b>0.4.0 — Highlight settings and clearer tooltips</b></p>
         <ul>
-          <li>Hovering a swatch temporarily highlights its exact Java expression.</li>
-          <li>Tooltip labels identify the corresponding source expression.</li>
-          <li>English and Spanish localization follows the IDE language automatically.</li>
-          <li>Left-click edits the current use; right-click edits the definition.</li>
-          <li>Transparency checkerboard, opacity support, and native picker.</li>
-          <li>Safer single-step edits after confirmation.</li>
+          <li>Enable or disable source highlighting in Settings &gt; Tools &gt; ARGB Color Lens.</li>
+          <li>Choose a custom highlight color or match each ARGB swatch automatically.</li>
+          <li>Persist preferences across projects and IDE restarts.</li>
+          <li>Show symbolic reference names but never repeat a literal's hexadecimal value.</li>
+          <li>Retain native color editing and English/Spanish localization.</li>
         </ul>
     ]]></change-notes>
 
@@ -46,5 +45,10 @@
                 implementationClass="io.github.leonardoaliaga.argbcolorlens.ArgbLineMarkerProvider"/>
         <editorFactoryListener
                 implementation="io.github.leonardoaliaga.argbcolorlens.ArgbHoverEditorFactoryListener"/>
+        <applicationConfigurable
+                parentId="tools"
+                id="io.github.leonardoaliaga.argbcolorlens.settings"
+                instance="io.github.leonardoaliaga.argbcolorlens.ArgbSettingsConfigurable"
+                displayName="ARGB Color Lens"/>
     </extensions>
 </idea-plugin>
