@@ -1,4 +1,6 @@
 import org.jetbrains.intellij.platform.gradle.TestFrameworkType
+import org.jetbrains.intellij.platform.gradle.tasks.VerifyPluginSignatureTask
+import java.util.Base64
 
 plugins {
     id("org.jetbrains.kotlin.jvm")
@@ -44,6 +46,15 @@ intellijPlatform {
 
 // Gradle 9 requires an explicit producer/consumer relationship for the signed ZIP.
 // The signature verifier reads signPlugin's output and must run after signing.
-tasks.named("verifyPluginSignature") {
+tasks.named<VerifyPluginSignatureTask>("verifyPluginSignature") {
     dependsOn(tasks.named("signPlugin"))
+
+    // The signing task decodes Base64 signing secrets, but the signature
+    // verifier writes certificateChain to a temporary PEM file unchanged.
+    // Decode explicitly so the verification CLI receives valid X.509 PEM.
+    certificateChain.set(
+        providers.environmentVariable("CERTIFICATE_CHAIN").map { encoded ->
+            String(Base64.getMimeDecoder().decode(encoded), Charsets.UTF_8)
+        }
+    )
 }

@@ -88,6 +88,10 @@ The build explicitly declares that `verifyPluginSignature` depends on
 `signPlugin`; this is required by Gradle 9 when the verifier reads the signed
 ZIP produced by the signing task.
 
+The certificate secret is stored Base64-encoded for GitHub Actions.
+The Gradle verifier decodes it to PEM before handing it to the Marketplace ZIP
+Signer CLI, while `signPlugin` accepts the original Base64 value.
+
 A successful run confirms the key and certificate can sign this plugin ZIP. It
 does **not** verify the Marketplace token or upload any version.
 
