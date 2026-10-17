@@ -9,6 +9,12 @@ The project uses [Semantic Versioning](https://semver.org/).
 ### Planned
 - More Java constant-expression formats, subject to safe PSI evaluation.
 
+## [0.4.1] - 2026-10-16
+
+### Fixed
+- Package the Gradle 9 signing task dependency and X.509 certificate decoding corrections for automated JetBrains Marketplace releases.
+- No changes to plugin functionality compared with 0.4.0.
+
 ## [0.4.0] - 2026-10-16
 
 ### Added
@@ -62,7 +68,8 @@ The project uses [Semantic Versioning](https://semver.org/).
 - Initial prototype with ARGB hexadecimal swatches in Java files.
 - Basic resolution of direct `final` Java field references.
 
-[Unreleased]: https://github.com/LeonardoAliaga/ARGBColorLens/compare/v0.4.0...HEAD
+[Unreleased]: https://github.com/LeonardoAliaga/ARGBColorLens/compare/v0.4.1...HEAD
+[0.4.1]: https://github.com/LeonardoAliaga/ARGBColorLens/releases/tag/v0.4.1
 [0.4.0]: https://github.com/LeonardoAliaga/ARGBColorLens/releases/tag/v0.4.0
 [0.3.0]: https://github.com/LeonardoAliaga/ARGBColorLens/releases/tag/v0.3.0
 [0.2.0]: https://github.com/LeonardoAliaga/ARGBColorLens/releases/tag/v0.2.0
