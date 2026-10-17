@@ -4,13 +4,15 @@
 
 ARGB Color Lens adds a color swatch to the editor gutter for Java literals written as `0xAARRGGBB`, including references to `final` fields initialized with an ARGB literal. You can choose whether to change an individual usage or the original color definition.
 
-[![Version](https://img.shields.io/badge/version-0.2.0-blue)](https://github.com/LeonardoAliaga/ARGBColorLens)
+[![Version](https://img.shields.io/badge/version-0.3.0-blue)](https://github.com/LeonardoAliaga/ARGBColorLens)
 [![License](https://img.shields.io/badge/license-MIT-green)](LICENSE)
 [![IntelliJ](https://img.shields.io/badge/IntelliJ_Platform-2026.2%2B-7F52FF)](https://www.jetbrains.com/idea/)
 
 ## Features
 
 - **ARGB previews:** gutter swatches for `0xAARRGGBB` values in Java, including the alpha (transparency) channel.
+- **Hover highlighting:** hover over a color swatch to temporarily highlight the exact Java expression associated with it. Tooltips display the source expression too.
+- **Automatic localization:** English is the default; Spanish is used automatically when the IDE language is Spanish. Other languages fall back to English.
 - **Reference awareness:** resolves usages such as `UiTheme.TEXT_PRIMARY` when the referenced `final` field has a direct ARGB literal initializer.
 - **Left-click — local edit:** choose a color and replace only that expression with an ARGB literal.
 - **Right-click — definition edit:** choose a color and change the source field's initializer, preserving its usages.
@@ -33,6 +35,7 @@ Clicking a swatch associated with `UiTheme.TEXT_PRIMARY`:
 
 | Action | Behavior |
 | --- | --- |
+| Hover | Highlight the corresponding source expression temporarily (no source modifications) |
 | Left-click | Replace that usage with a chosen `0xAARRGGBB` value |
 | Right-click | Update `UiTheme.TEXT_PRIMARY` at its declaration |
 | Cancel | Leave the source code unchanged |
@@ -45,7 +48,7 @@ For a direct hexadecimal literal, either click edits that literal.
 - **Language analyzed:** Java. The plugin implementation itself is in Kotlin.
 - Supports **eight-digit** hexadecimal integer literals `0xAARRGGBB` and **direct initializers** of `final` Java fields.
 - Does not yet evaluate computed colors, chained constants, CSS values, `Color` objects, or arbitrary expressions.
-- IntelliJ may group gutter icons when multiple color expressions share a line.
+- IntelliJ may group gutter icons when multiple color expressions share a line. Hover highlighting works for individually accessible swatches; IDE-managed grouped icons are a remaining limitation.
 - Standalone files opened without a full project may have reduced PSI/reference resolution support.
 
 ## Install
@@ -79,9 +82,11 @@ Test changes inside the **sandbox IDE** opened by `runIde` before installing the
 
 - **Clic izquierdo:** modifica solo el uso seleccionado.
 - **Clic derecho:** modifica el color original de la constante.
+- **Hover:** resalta temporalmente la expresión Java correspondiente y muestra su nombre en la descripción.
+- **Idioma:** la interfaz del plugin se adapta automáticamente al inglés o español del IDE.
 - Se conserva la transparencia ARGB y se utiliza el selector de colores de IntelliJ.
 
-La versión **0.2.0** es la primera versión preparada para publicación. Consulta [CHANGELOG.md](CHANGELOG.md) para conocer los cambios.
+La versión **0.3.0** incorpora resaltado por hover y localización inglés/español. La versión **0.2.0** fue la primera versión pública. Consulta [CHANGELOG.md](CHANGELOG.md) para conocer los cambios.
 
 ## Author and links
 
