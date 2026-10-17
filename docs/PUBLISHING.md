@@ -84,6 +84,10 @@ reads the three signing secrets, builds the plugin, runs `signPlugin` and
 `verifyPluginSignature`, and does **not** run `publishPlugin`. It also runs
 automatically the first time the verification workflow is added to `main`.
 
+The build explicitly declares that `verifyPluginSignature` depends on
+`signPlugin`; this is required by Gradle 9 when the verifier reads the signed
+ZIP produced by the signing task.
+
 A successful run confirms the key and certificate can sign this plugin ZIP. It
 does **not** verify the Marketplace token or upload any version.
 
