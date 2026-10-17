@@ -1,31 +1,149 @@
-# Deliberately manual: the first Marketplace upload must be performed
-# by the owner following JetBrains' publication and signing requirements.
-name: Package Release Candidate
+name: Release Plugin
 
+# The version in gradle.properties is the single source of truth.
+# A GitHub Release is created once per version. Marketplace publishing is
+# opt-in and needs repository secrets; no credentials are stored in Git.
 on:
+  push:
+    branches: [main]
   workflow_dispatch:
+    inputs:
+      publish_marketplace:
+        description: "Publish this version to JetBrains Marketplace (requires secrets and enable variable)"
+        type: boolean
+        required: false
+        default: false
 
 permissions:
-  contents: read
+  contents: write
+
+concurrency:
+  group: argbcolorlens-release-main
+  cancel-in-progress: false
 
 jobs:
-  package:
+  release:
+    name: Verify and create GitHub Release
+    if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.version.outputs.version }}
+      tag: ${{ steps.version.outputs.tag }}
+      created: ${{ steps.version.outputs.create }}
     steps:
+      - name: Free runner disk space
+        uses: jlumbroso/free-disk-space@v1.3.1
+        with:
+          tool-cache: false
+          large-packages: false
+
+      - name: Checkout with tags
+        uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      - name: Read and validate version
+        id: version
+        shell: bash
+        run: |
+          set -euo pipefail
+          version="$(sed -n 's/^version=//p' gradle.properties | head -n 1 | tr -d '\r')"
+          if [[ ! "$version" =~ ^[0-9]+\.[0-9]+\.[0-9]+([+-][0-9A-Za-z.-]+)?$ ]]; then
+            echo "::error::Invalid or missing version in gradle.properties"
+            exit 1
+          fi
+          tag="v$version"
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+          echo "tag=$tag" >> "$GITHUB_OUTPUT"
+          if git ls-remote --exit-code --tags origin "refs/tags/$tag" > /dev/null; then
+            echo "create=false" >> "$GITHUB_OUTPUT"
+            echo "Existing tag $tag — skipping duplicate GitHub Release."
+          else
+            echo "create=true" >> "$GITHUB_OUTPUT"
+            echo "New version $version — preparing GitHub Release."
+          fi
+
+      - name: Install JDK 25
+        if: steps.version.outputs.create == 'true'
+        uses: actions/setup-java@v5
+        with:
+          distribution: zulu
+          java-version: "25"
+
+      - name: Setup Gradle
+        if: steps.version.outputs.create == 'true'
+        uses: gradle/actions/setup-gradle@v6
+
+      - name: Validate and build plugin ZIP
+        if: steps.version.outputs.create == 'true'
+        run: bash ./gradlew check buildPlugin verifyPlugin --stacktrace
+
+      - name: Publish immutable GitHub Release
+        if: steps.version.outputs.create == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          shopt -s nullglob
+          archives=(build/distributions/*.zip)
+          if (( #${#archives[@]} == 0 )); then
+            echo "::error::Missing plugin distribution ZIP."
+            exit 1
+          fi
+          gh release create "${{ steps.version.outputs.tag }}" "${archives[@]}" \
+            --target "$GITHUB_SHA" \
+            --title "ARGB Color Lens ${{ steps.version.outputs.version }}" \
+            --generate-notes
+
+  marketplace:
+    name: Sign and publish to JetBrains Marketplace
+    needs: release
+    # Never publish on ordinary source-only commits after a version is tagged.
+    # A manual dispatch can retry the currently tagged version after secrets
+    # are configured. Explicit opt-in must be enabled in repository variables.
+    if: >-
+      github.ref == 'refs/heads/main' &&
+      vars.MARKETPLACE_AUTO_PUBLISH == 'true' &&
+      (needs.release.outputs.created == 'true' ||
+       (github.event_name == 'workflow_dispatch' && inputs.publish_marketplace == true))
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    env:
+      PUBLISH_TOKEN: ${{ secrets.PUBLISH_TOKEN }}
+      CERTIFICATE_CHAIN: ${{ secrets.CERTIFICATE_CHAIN }}
+      PRIVATE_KEY: ${{ secrets.PRIVATE_KEY }}
+      PRIVATE_KEY_PASSWORD: ${{ secrets.PRIVATE_KEY_PASSWORD }}
+    steps:
+      - name: Verify required secrets are configured
+        shell: bash
+        run: |
+          set -euo pipefail
+          for name in PUBLISH_TOKEN CERTIFICATE_CHAIN PRIVATE_KEY PRIVATE_KEY_PASSWORD; do
+            if [[ -z "${!name}" ]]; then
+              echo "::error::Missing GitHub Actions secret: $name"
+              exit 1
+            fi
+          done
+
+      - name: Free runner disk space
+        uses: jlumbroso/free-disk-space@v1.3.1
+        with:
+          tool-cache: false
+          large-packages: false
+
       - name: Checkout
         uses: actions/checkout@v7
+
       - name: Install JDK 25
         uses: actions/setup-java@v5
         with:
           distribution: zulu
           java-version: "25"
+
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v6
-      - name: Build plugin archive
-        run: bash ./gradlew check buildPlugin --stacktrace
-      - name: Upload ZIP for manual review
-        uses: actions/upload-artifact@v7
-        with:
-          name: ARGBColorLens-release-candidate
-          path: build/distributions/*.zip
-          if-no-files-found: error
+
+      - name: Build, sign, verify and publish
+        run: bash ./gradlew check buildPlugin verifyPlugin signPlugin verifyPluginSignature publishPlugin --stacktrace

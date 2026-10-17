@@ -40,14 +40,66 @@ bash ./gradlew clean check buildPlugin verifyPlugin
 
 The installable ZIP is in `build/distributions/`. To test it, use **Settings → Plugins → Install Plugin from Disk** in a separate IDE instance.
 
-## Future releases
+## Automated releases from `main`
 
-- Bump `version` in `gradle.properties` using semantic versioning.
-- Update `CHANGELOG.md` and the `<change-notes>` entry in `plugin.xml`.
-- Build, test and verify before creating a Git tag (for example `v0.2.0`).
-- After the first manual Marketplace release, optional automation can be configured securely using JetBrains' `publishPlugin` and signing tasks. The repository intentionally **does not publish automatically** on a GitHub release.
+The source of truth is `version=...` in `gradle.properties`. The workflow
+`.github/workflows/release.yml` runs on every push to `main`, but only builds and
+creates a public **GitHub Release** when the corresponding `v<version>` tag does not
+yet exist. It runs `check buildPlugin verifyPlugin` before tagging, then attaches
+the distributable ZIP. Further commits with the same version do not create
+duplicate releases.
+
+**Increase the version only after the release is ready.** An existing Git tag
+must not be reused for new plugin code. Before merging a new version, complete
+`docs/TESTING.md` in the sandbox IDE; GitHub Actions does not reproduce UI mouse events.
+
+### JetBrains Marketplace credentials (manual setup, never commit secrets)
+
+The Marketplace listing must already exist (first upload was manual).
+Create a personal Marketplace token under **JetBrains Marketplace → Profile →
+My Tokens**. Generate an authentication token and record it in GitHub repository
+Settings → Secrets and variables → Actions → Secrets → New repository secret,
+under exactly this name:
+
+- `PUBLISH_TOKEN`: JetBrains Marketplace personal access token.
+
+For plugin signing, follow the official instructions at
+https://plugins.jetbrains.com/docs/intellij/plugin-signing.html to generate a
+private key and X.509 certificate chain **locally**. Back up the private key
+securely, never commit it, and store these three more repository secrets:
+
+- `CERTIFICATE_CHAIN`: certificate chain PEM, or its Base64 representation.
+- `PRIVATE_KEY`: private key PEM, or its Base64 representation.
+- `PRIVATE_KEY_PASSWORD`: password chosen for the private key.
+
+The IntelliJ Platform Gradle Plugin supports PEM or Base64-encoded certificate
+and private key content. All four secrets must be configured before enabling
+publication. **Do not paste any secret into issues, commits, logs, or chats.**
+
+Next go to GitHub Settings → Secrets and variables → Actions → **Variables**
+and create a repository variable:
+
+- `MARKETPLACE_AUTO_PUBLISH` = `true`
+
+Until this variable is enabled, GitHub Releases still work but Marketplace
+uploads are skipped. When enabled, the workflow calls `signPlugin`,
+`verifyPluginSignature`, and `publishPlugin` for each **newly tagged** version
+only. The Marketplace may still review an upload before it is publicly visible.
+
+### Publishing the current version after enabling secrets
+
+If GitHub already created tag `v0.4.0` before secrets were configured, the next
+source-only push will **not** republish the same version. Instead, in GitHub
+Actions → **Release Plugin** → Run workflow, choose branch `main` and set
+**Publish this version to JetBrains Marketplace** to `true`. The manual retry
+does not recreate the existing GitHub Release. Avoid retrying after a successful
+Marketplace upload, because JetBrains rejects duplicate version numbers.
+
+For the next update, increment `gradle.properties`, update the changelog and
+`plugin.xml` release notes, test it, and merge into `main`. The automation
+will create `v<version>` once and publish to Marketplace if enabled.
 
 Official references:
 - https://plugins.jetbrains.com/docs/intellij/publishing-plugin.html
 - https://plugins.jetbrains.com/docs/intellij/plugin-signing.html
-- https://plugins.jetbrains.com/docs/intellij/plugin-configuration-file.html
+- https://docs.github.com/en/actions/how-tos/write-workflows/choose-what-workflows-do/use-secrets

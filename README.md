@@ -85,6 +85,8 @@ Requirements: **JDK 25**, the Gradle wrapper bundled with this repository, and i
 
 On macOS and Linux, use `bash ./gradlew` instead of `.\gradlew.bat`.
 
+On a new version in `main`, GitHub Actions automatically builds and creates a **GitHub Release** with the plugin ZIP; Marketplace publishing is optional and requires secure setup. See [publishing guide](docs/PUBLISHING.md).
+
 Test changes inside the **sandbox IDE** opened by `runIde` before installing them in your main IDE. Please open an [issue](https://github.com/LeonardoAliaga/ARGBColorLens/issues) for bugs or feature requests. See [publication checklist](docs/PUBLISHING.md) and [test checklist](docs/TESTING.md).
 
 ## Español
