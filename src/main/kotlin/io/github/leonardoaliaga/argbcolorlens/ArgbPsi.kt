@@ -15,6 +15,24 @@ internal object ArgbPsi {
 
     private val pattern = Regex("0[xX][0-9a-fA-F]{8}")
 
+    /** Resolve an actual Java token to the exact expression represented by its swatch. */
+    fun expressionForLeaf(element: PsiElement): PsiExpression? {
+        if (!element.isValid) return null
+        if (element is PsiIdentifier) {
+            val reference = element.parent as? PsiReferenceExpression
+            if (reference != null &&
+                reference.referenceNameElement == element &&
+                sourceField(reference) != null
+            ) return reference
+        }
+        if (element is PsiJavaToken) {
+            val literal = element.parent as? PsiLiteralExpression
+            if (literal != null && parseArgb(literal.text) != null) return literal
+        }
+        return null
+    }
+
+
     /**
      * Identifica la expresión ARGB donde está el cursor.
      */

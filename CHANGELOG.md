@@ -10,6 +10,17 @@ The project uses [Semantic Versioning](https://semver.org/).
 - Configurable preferences for swatch behavior and visual appearance.
 - More Java constant-expression formats, subject to safe PSI evaluation.
 
+## [0.3.0] - 2026-10-16
+
+### Added
+- Hover over an ARGB gutter icon to temporarily highlight its corresponding Java expression.
+- Tooltips include both the ARGB value and source expression for easier identification.
+- English and Spanish localization bundles, selected automatically from the IDE language.
+
+### Changed
+- Standardized all plugin-owned UI messages in resource bundles, with English fallback.
+- Retained the left-click local editor, right-click constant editor, and alpha-aware native picker.
+
 ## [0.2.0] - 2026-10-16
 
 ### Added
@@ -36,5 +47,6 @@ The project uses [Semantic Versioning](https://semver.org/).
 - Initial prototype with ARGB hexadecimal swatches in Java files.
 - Basic resolution of direct `final` Java field references.
 
-[Unreleased]: https://github.com/LeonardoAliaga/ARGBColorLens/compare/v0.2.0...HEAD
+[Unreleased]: https://github.com/LeonardoAliaga/ARGBColorLens/compare/v0.3.0...HEAD
+[0.3.0]: https://github.com/LeonardoAliaga/ARGBColorLens/releases/tag/v0.3.0
 [0.2.0]: https://github.com/LeonardoAliaga/ARGBColorLens/releases/tag/v0.2.0

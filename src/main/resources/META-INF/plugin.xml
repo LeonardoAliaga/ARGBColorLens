@@ -4,7 +4,7 @@
     <name>ARGB Color Lens</name>
     <vendor url="https://github.com/LeonardoAliaga">Leonardo Aliaga</vendor>
 
-    <!-- The release number comes from gradle.properties (version=0.2.0).
+    <!-- The release number comes from gradle.properties (version=0.3.0).
          Gradle's patchPluginXml task inserts it into the packaged descriptor. -->
     <idea-version since-build="262"/>
 
@@ -14,6 +14,7 @@
         (<code>0xAARRGGBB</code>) and for references to <code>final</code> Java
         fields initialized with a matching hexadecimal literal.</p>
         <ul>
+          <li><b>Hover</b> to highlight the expression associated with a swatch.</li>
           <li><b>Left-click</b> to change only the selected expression.</li>
           <li><b>Right-click</b> to update the original constant definition.</li>
           <li>Preview alpha transparency on a checkerboard and edit opacity
@@ -26,9 +27,11 @@
     ]]></description>
 
     <change-notes><![CDATA[
-        <p><b>0.2.0 — First public release</b></p>
+        <p><b>0.3.0 — Hover highlights and localization</b></p>
         <ul>
-          <li>ARGB previews for literals and directly initialized Java constants.</li>
+          <li>Hovering a swatch temporarily highlights its exact Java expression.</li>
+          <li>Tooltip labels identify the corresponding source expression.</li>
+          <li>English and Spanish localization follows the IDE language automatically.</li>
           <li>Left-click edits the current use; right-click edits the definition.</li>
           <li>Transparency checkerboard, opacity support, and native picker.</li>
           <li>Safer single-step edits after confirmation.</li>
@@ -41,5 +44,9 @@
         <codeInsight.lineMarkerProvider
                 language="JAVA"
                 implementationClass="io.github.leonardoaliaga.argbcolorlens.ArgbLineMarkerProvider"/>
+        <editorFactoryMouseMotionListener
+                implementation="io.github.leonardoaliaga.argbcolorlens.ArgbHoverMouseMotionListener"/>
+        <editorFactoryListener
+                implementation="io.github.leonardoaliaga.argbcolorlens.ArgbHoverEditorFactoryListener"/>
     </extensions>
 </idea-plugin>
