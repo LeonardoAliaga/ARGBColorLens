@@ -76,6 +76,20 @@ The IntelliJ Platform Gradle Plugin supports PEM or Base64-encoded certificate
 and private key content. All four secrets must be configured before enabling
 publication. **Do not paste any secret into issues, commits, logs, or chats.**
 
+### Verify the signing secrets before enabling publication
+
+Run **GitHub Actions → Verify Plugin Signing → Run workflow**, select `main`,
+and inspect the **Sign and verify ZIP without publishing** job. The workflow
+reads the three signing secrets, builds the plugin, runs `signPlugin` and
+`verifyPluginSignature`, and does **not** run `publishPlugin`. It also runs
+automatically the first time the verification workflow is added to `main`.
+
+A successful run confirms the key and certificate can sign this plugin ZIP. It
+does **not** verify the Marketplace token or upload any version.
+
+Only after signing succeeds and the manual IDE checklist is complete, enable
+Marketplace publication:
+
 Next go to GitHub Settings → Secrets and variables → Actions → **Variables**
 and create a repository variable:
 
