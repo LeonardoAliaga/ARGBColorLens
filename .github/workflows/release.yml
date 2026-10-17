@@ -87,7 +87,7 @@ jobs:
           set -euo pipefail
           shopt -s nullglob
           archives=(build/distributions/*.zip)
-          if (( #${#archives[@]} == 0 )); then
+          if (( ${#archives[@]} == 0 )); then
             echo "::error::Missing plugin distribution ZIP."
             exit 1
           fi
