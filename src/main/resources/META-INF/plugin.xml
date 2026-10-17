@@ -21,26 +21,10 @@
          Read more: https://plugins.jetbrains.com/docs/intellij/plugin-compatibility.html -->
     <depends>com.intellij.java</depends>
 
+    <!-- One custom marker per ARGB expression: no native colorProvider duplicates. -->
     <extensions defaultExtensionNs="com.intellij">
-        <colorProvider
-                implementation="io.github.leonardoaliaga.argbcolorlens.ArgbColorProvider"/>
+        <codeInsight.lineMarkerProvider
+                language="JAVA"
+                implementationClass="io.github.leonardoaliaga.argbcolorlens.ArgbLineMarkerProvider"/>
     </extensions>
-
-    <actions>
-        <action
-                id="io.github.leonardoaliaga.argbcolorlens.editArgb"
-                class="io.github.leonardoaliaga.argbcolorlens.EditArgbColorAction"
-                text="ARGB Color Lens: editar color…"
-                description="Elegir dónde aplicar un cambio de color">
-
-            <add-to-group
-                    group-id="EditorPopupMenu"
-                    anchor="last"/>
-        </action>
-    </actions>
-    <!-- Extensions defined by the plugin.
-         Read more: https://plugins.jetbrains.com/docs/intellij/plugin-extension-points.html -->
-    <extensions defaultExtensionNs="com.intellij">
-    </extensions>
-
 </idea-plugin>
