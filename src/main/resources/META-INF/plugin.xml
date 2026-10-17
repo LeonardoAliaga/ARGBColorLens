@@ -32,7 +32,7 @@
           <li>Enable or disable source highlighting in Settings &gt; Tools &gt; ARGB Color Lens.</li>
           <li>Choose a custom highlight color or match each ARGB swatch automatically.</li>
           <li>Persist preferences across projects and IDE restarts.</li>
-          <li>Show symbolic reference names but never repeat a literal's hexadecimal value.</li>
+          <li>Keep tooltips concise when highlighting is enabled; show ARGB/reference details only when highlighting is disabled.</li>
           <li>Retain native color editing and English/Spanish localization.</li>
         </ul>
     ]]></change-notes>
