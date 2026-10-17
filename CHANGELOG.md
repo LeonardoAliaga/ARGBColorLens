@@ -7,8 +7,19 @@ The project uses [Semantic Versioning](https://semver.org/).
 ## [Unreleased]
 
 ### Planned
-- Configurable preferences for swatch behavior and visual appearance.
 - More Java constant-expression formats, subject to safe PSI evaluation.
+
+## [0.4.0] - 2026-10-16
+
+### Added
+- Settings page at **Settings → Tools → ARGB Color Lens**.
+- Application-wide persistent option to enable or disable the hover expression highlight.
+- Custom highlight color picker and an option to derive the highlight from each swatch.
+
+### Changed
+- Tooltip labels show symbolic Java constant names only for references and do not duplicate literal hexadecimal values.
+- Highlight backgrounds blend with the IDE theme for readability, even for fully transparent ARGB swatches.
+- New settings and explanatory text are translated into English and Spanish.
 
 ## [0.3.0] - 2026-10-16
 
@@ -47,6 +58,7 @@ The project uses [Semantic Versioning](https://semver.org/).
 - Initial prototype with ARGB hexadecimal swatches in Java files.
 - Basic resolution of direct `final` Java field references.
 
-[Unreleased]: https://github.com/LeonardoAliaga/ARGBColorLens/compare/v0.3.0...HEAD
+[Unreleased]: https://github.com/LeonardoAliaga/ARGBColorLens/compare/v0.4.0...HEAD
+[0.4.0]: https://github.com/LeonardoAliaga/ARGBColorLens/releases/tag/v0.4.0
 [0.3.0]: https://github.com/LeonardoAliaga/ARGBColorLens/releases/tag/v0.3.0
 [0.2.0]: https://github.com/LeonardoAliaga/ARGBColorLens/releases/tag/v0.2.0

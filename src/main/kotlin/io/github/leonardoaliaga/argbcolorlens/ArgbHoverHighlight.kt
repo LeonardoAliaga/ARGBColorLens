@@ -12,7 +12,7 @@ import com.intellij.openapi.editor.markup.TextAttributes
 import com.intellij.psi.PsiDocumentManager
 import com.intellij.psi.PsiElement
 import com.intellij.psi.SmartPsiElementPointer
-import com.intellij.ui.JBColor
+import java.awt.Color
 import java.awt.Component
 import java.awt.Font
 import java.awt.IllegalComponentStateException
@@ -49,8 +49,15 @@ internal object ArgbHoverHighlight {
     }
 
     private fun showOnEdt(pointer: SmartPsiElementPointer<out PsiElement>) {
+        val preferences = ArgbHighlightSettings.getInstance().snapshot()
+        if (!preferences.enabled) {
+            clear()
+            return
+        }
+
         val token = pointer.element ?: return
         val expression = ArgbPsi.expressionForLeaf(token) ?: return
+        val sourceColor = ArgbPsi.colorOf(expression) ?: return
         val file = expression.containingFile ?: return
         val document = PsiDocumentManager.getInstance(expression.project).getDocument(file) ?: return
 
@@ -91,13 +98,12 @@ internal object ArgbHoverHighlight {
 
         clear()
 
-        val attributes = TextAttributes(
-            null,
-            JBColor(0xB9E7FA, 0x365568),
-            JBColor(0x178BB9, 0x81D8FF),
-            EffectType.ROUNDED_BOX,
-            Font.PLAIN
-        )
+        val chosenColor = if (preferences.useSwatchColor) {
+            sourceColor
+        } else {
+            Color(preferences.customColorArgb, true)
+        }
+        val attributes = highlightAttributes(editor, chosenColor)
         val highlighter = editor.markupModel.addRangeHighlighter(
             range.startOffset,
             range.endOffset,
@@ -106,6 +112,28 @@ internal object ArgbHoverHighlight {
             HighlighterTargetArea.EXACT_RANGE
         )
         active = Active(editor, gutter, point, highlighter)
+    }
+
+    /**
+     * Blend the color with the editor theme to keep text readable.
+     * RGB drives the highlight even when the swatch's alpha is zero.
+     */
+    private fun highlightAttributes(editor: Editor, selected: Color): TextAttributes {
+        val base = editor.colorsScheme.defaultBackground
+        val isDark = (base.red * 299 + base.green * 587 + base.blue * 114) < 128000
+        val contrast = if (isDark) Color.WHITE else Color.BLACK
+        val background = blend(base, selected, 0.36)
+        val outline = blend(selected, contrast, 0.42)
+        return TextAttributes(null, background, outline, EffectType.ROUNDED_BOX, Font.PLAIN)
+    }
+
+    private fun blend(base: Color, accent: Color, weight: Double): Color {
+        fun channel(a: Int, b: Int) = (a + (b - a) * weight).toInt().coerceIn(0, 255)
+        return Color(
+            channel(base.red, accent.red),
+            channel(base.green, accent.green),
+            channel(base.blue, accent.blue)
+        )
     }
 
     /**

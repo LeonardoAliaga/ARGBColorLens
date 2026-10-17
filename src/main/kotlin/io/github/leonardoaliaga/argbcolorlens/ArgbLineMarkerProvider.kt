@@ -32,10 +32,13 @@ class ArgbLineMarkerProvider : LineMarkerProvider {
         val color = ArgbPsi.colorOf(expression) ?: return null
         val hex = "0x%08X".format(color.rgb)
         val definition = expression is PsiReferenceExpression
-        val tooltip = ArgbMessages.message(
-            if (definition) "swatch.reference" else "swatch.literal",
-            hex, expression.text
-        )
+        // Only symbolic references need their source name; literals already
+        // display their hexadecimal value once without duplication.
+        val tooltip = if (definition) {
+            ArgbMessages.message("swatch.reference", hex, expression.text)
+        } else {
+            ArgbMessages.message("swatch.literal", hex)
+        }
 
         val anchor = SmartPointerManager.createPointer(element)
 
@@ -122,7 +125,7 @@ private class EditColorAction(
 }
 
 /** Transparency checkerboard + an ARGB overlay with a distinct border. */
-private class ArgbSwatchIcon(private val argb: Int) : Icon {
+internal class ArgbSwatchIcon(private val argb: Int) : Icon {
     override fun getIconWidth() = 12
     override fun getIconHeight() = 12
 
