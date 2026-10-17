@@ -9,6 +9,11 @@ The project uses [Semantic Versioning](https://semver.org/).
 ### Planned
 - More Java constant-expression formats, subject to safe PSI evaluation.
 
+## [0.4.2] - 2026-10-17
+
+### Fixed
+- Replace the deprecated `ReadAction.compute(ThrowableComputable)` call with `ReadAction.computeBlocking` for the brief hover PSI lookup on the EDT, removing that deprecated API usage while retaining explicit read access.
+
 ## [0.4.1] - 2026-10-16
 
 ### Fixed
@@ -68,7 +73,8 @@ The project uses [Semantic Versioning](https://semver.org/).
 - Initial prototype with ARGB hexadecimal swatches in Java files.
 - Basic resolution of direct `final` Java field references.
 
-[Unreleased]: https://github.com/LeonardoAliaga/ARGBColorLens/compare/v0.4.1...HEAD
+[Unreleased]: https://github.com/LeonardoAliaga/ARGBColorLens/compare/v0.4.2...HEAD
+[0.4.2]: https://github.com/LeonardoAliaga/ARGBColorLens/releases/tag/v0.4.2
 [0.4.1]: https://github.com/LeonardoAliaga/ARGBColorLens/releases/tag/v0.4.1
 [0.4.0]: https://github.com/LeonardoAliaga/ARGBColorLens/releases/tag/v0.4.0
 [0.3.0]: https://github.com/LeonardoAliaga/ARGBColorLens/releases/tag/v0.3.0

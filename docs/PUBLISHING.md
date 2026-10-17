@@ -4,7 +4,7 @@ This project targets **IntelliJ IDEA 2026.2+ / IntelliJ Platform build 262+**, i
 
 ## Before publishing
 
-1. Confirm that the `main` branch contains version **0.4.1** and that its CI build is green.
+1. Confirm that the `main` branch contains version **0.4.2** and that its CI build is green.
 2. Run `compileKotlin`, `check`, `buildPlugin`, and `verifyPlugin` using JDK **25**.
 3. Run `runIde` and complete the [manual test checklist](TESTING.md), including the distinction between left and right click and Cancel behavior.
 4. Inspect the generated `build/distributions/*.zip`, including the packaged `META-INF/plugin.xml`, plugin name/version/vendor and icon.

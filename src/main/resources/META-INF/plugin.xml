@@ -4,7 +4,7 @@
     <name>ARGB Color Lens</name>
     <vendor url="https://github.com/LeonardoAliaga">Leonardo Aliaga</vendor>
 
-    <!-- The release number comes from gradle.properties (version=0.4.1).
+    <!-- The release number comes from gradle.properties (version=0.4.2).
          Gradle's patchPluginXml task inserts it into the packaged descriptor. -->
     <idea-version since-build="262"/>
 
@@ -27,6 +27,11 @@
     ]]></description>
 
     <change-notes><![CDATA[
+        <p><b>0.4.2 — IntelliJ read-action API compatibility</b></p>
+        <ul>
+          <li>Replace deprecated ReadAction.compute with computeBlocking for the brief hover PSI lookup on the UI thread.</li>
+          <li>Preserve explicit PSI read access and existing hover highlighting behavior.</li>
+        </ul>
         <p><b>0.4.1 — Release signing and publishing maintenance</b></p>
         <ul>
           <li>Maintenance update to package the verified Gradle 9 plugin-signing configuration.</li>

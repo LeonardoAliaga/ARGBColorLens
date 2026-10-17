@@ -67,14 +67,14 @@ internal object ArgbHoverHighlight {
 
         // Being on the Swing EDT is NOT equivalent to having PSI read access
         // in IntelliJ Platform 2026.2+. Even pointer.element checks PSI validity.
-        // Resolve and snapshot everything from PSI in an explicit read action.
-        val target = ReadAction.compute<HoverTarget?, RuntimeException> {
-            val token = pointer.element ?: return@compute null
-            val expression = ArgbPsi.expressionForLeaf(token) ?: return@compute null
-            val sourceColor = ArgbPsi.colorOf(expression) ?: return@compute null
-            val file = expression.containingFile ?: return@compute null
+        // Keep this read action short and on the EDT; no PSI escapes the snapshot.
+        val target = ReadAction.computeBlocking<HoverTarget?, RuntimeException> {
+            val token = pointer.element ?: return@computeBlocking null
+            val expression = ArgbPsi.expressionForLeaf(token) ?: return@computeBlocking null
+            val sourceColor = ArgbPsi.colorOf(expression) ?: return@computeBlocking null
+            val file = expression.containingFile ?: return@computeBlocking null
             val document = PsiDocumentManager.getInstance(expression.project)
-                .getDocument(file) ?: return@compute null
+                .getDocument(file) ?: return@computeBlocking null
             HoverTarget(document, expression.textRange, sourceColor)
         } ?: return
 
