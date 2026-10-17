@@ -72,7 +72,7 @@ class ArgbLineMarkerProvider : LineMarkerProvider {
  * The PSI is resolved again after the picker closes, so edits are atomic.
  */
 private class EditColorAction(
-    private val pointer: SmartPsiElementPointer<PsiElement>,
+    private val pointer: SmartPsiElementPointer<out PsiElement>,
     private val editDefinition: Boolean
 ) : AnAction() {
     override fun actionPerformed(e: AnActionEvent) {
