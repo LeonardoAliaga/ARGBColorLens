@@ -9,6 +9,7 @@ import com.intellij.openapi.editor.markup.GutterIconRenderer
 import com.intellij.openapi.ui.Messages
 import com.intellij.psi.*
 import com.intellij.ui.ColorChooserService
+import com.intellij.ui.ColorPickerListener
 import java.awt.Color
 import java.awt.Component
 import java.awt.Graphics
@@ -90,8 +91,16 @@ private class EditColorAction(
         else
             "ARGB Color Lens: editar este uso"
 
+        // IntelliJ treats an EMPTY listener list as the "Copy color" mode.
+        // A non-empty listener list enables "Choose" (confirm the selection).
+        // No changes are applied during live previews; only after confirmation.
+        val selectionMode = object : ColorPickerListener {
+            override fun colorChanged(color: Color) = Unit
+            override fun closed(color: Color?) = Unit
+        }
+
         val selected = ColorChooserService.getInstance().showDialog(
-            project, parent, title, originalColor, true, emptyList(), false
+            project, parent, title, originalColor, true, listOf(selectionMode), false
         ) ?: return
 
         // Never use the expression captured before showing the modal dialog.
