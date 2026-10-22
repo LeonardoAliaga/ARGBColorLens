@@ -4,7 +4,7 @@
     <name>ARGB Color Lens</name>
     <vendor url="https://github.com/LeonardoAliaga">Leonardo Aliaga</vendor>
 
-    <!-- The release number comes from gradle.properties (version=0.4.2).
+    <!-- The release number comes from gradle.properties (version=0.4.3).
          Gradle's patchPluginXml task inserts it into the packaged descriptor. -->
     <idea-version since-build="262"/>
 
@@ -27,6 +27,12 @@
     ]]></description>
 
     <change-notes><![CDATA[
+        <p><b>0.4.3 — Single color preview per expression</b></p>
+        <ul>
+          <li>Hide redundant native color swatches for ARGB literals and their variable declarations when an ARGB Color Lens swatch is present.</li>
+          <li>Keep the plugin's hover highlighting, left-click editing, right-click definition editing, and opacity controls.</li>
+          <li>Preserve unrelated gutter icons and native colors outside the plugin's supported expressions, including mixed groups on one line.</li>
+        </ul>
         <p><b>0.4.2 — IntelliJ read-action API compatibility</b></p>
         <ul>
           <li>Replace deprecated ReadAction.compute with computeBlocking for the brief hover PSI lookup on the UI thread.</li>
@@ -53,6 +59,9 @@
         <codeInsight.lineMarkerProvider
                 language="JAVA"
                 implementationClass="io.github.leonardoaliaga.argbcolorlens.ArgbLineMarkerProvider"/>
+        <gutterMarkPreprocessor
+                order="last"
+                implementation="io.github.leonardoaliaga.argbcolorlens.ArgbGutterMarkPreprocessor"/>
         <editorFactoryListener
                 implementation="io.github.leonardoaliaga.argbcolorlens.ArgbHoverEditorFactoryListener"/>
         <applicationConfigurable

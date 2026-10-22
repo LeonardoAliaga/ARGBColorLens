@@ -1,4 +1,22 @@
-# Manual testing checklist (0.4.0)
+# Testing ARGB Color Lens (0.4.3)
+
+## Duplicate-preview regression (0.4.3)
+
+`bash ./gradlew test` runs Java PSI fixture tests using IntelliJ's native color
+line-marker provider together with ARGB Color Lens. The tests cover literals,
+field/local-variable declarations, constant usages, transparent colors,
+unrelated gutter icons, and partially or fully duplicated native groups.
+
+In the sandbox IDE, also check with the other color-preview providers installed:
+
+- [ ] A declaration such as `static final int BASE = 0x804995B6;` shows only the ARGB Color Lens swatch, even when another provider recognizes the same literal or variable name.
+- [ ] The remaining swatch uses the configured hover highlight and both plugin click actions.
+- [ ] Left-click, right-click, opacity, confirmation, cancellation, and undo still work.
+- [ ] On a line containing both an ARGB value and another native color, the unrelated native color remains available.
+- [ ] A file or line without an ARGB Color Lens swatch keeps its native color previews.
+- [ ] Other gutter icons (implementations, overrides, breakpoints) remain visible.
+
+## Manual testing checklist
 
 Open a **full Java project** inside the sandbox IntelliJ IDEA started by `runIde`.
 

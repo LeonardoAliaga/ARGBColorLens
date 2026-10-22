@@ -7,6 +7,7 @@ import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.actionSystem.CommonDataKeys
 import com.intellij.openapi.editor.markup.GutterIconRenderer
 import com.intellij.openapi.ui.Messages
+import com.intellij.openapi.util.TextRange
 import com.intellij.psi.*
 import com.intellij.ui.ColorChooserService
 import com.intellij.ui.ColorPickerListener
@@ -45,6 +46,15 @@ class ArgbLineMarkerProvider : LineMarkerProvider {
         )
 
         val anchor = SmartPointerManager.createPointer(element)
+        // Compute these while the daemon holds read access. The gutter filter
+        // must not resolve PSI on the UI thread when it removes native duplicates.
+        val coveredColorRanges = buildList {
+            add(expression.textRange)
+            val variable = expression.parent as? PsiVariable
+            if (variable != null && variable.initializer == expression) {
+                variable.nameIdentifier?.textRange?.let(::add)
+            }
+        }
 
         return object : LineMarkerInfo<PsiElement>(
             element, element.textRange, ArgbSwatchIcon(color.rgb),
@@ -52,7 +62,9 @@ class ArgbLineMarkerProvider : LineMarkerProvider {
             Supplier { "ARGB Color Lens: $hex" }
         ) {
             override fun createGutterRenderer(): GutterIconRenderer =
-                object : LineMarkerInfo.LineMarkerGutterIconRenderer<PsiElement>(this) {
+                object : LineMarkerInfo.LineMarkerGutterIconRenderer<PsiElement>(this), ArgbSwatchRenderer {
+                    override val colorRanges: List<TextRange> = coveredColorRanges
+
                     override fun getTooltipText(): String {
                         ArgbHoverHighlight.show(anchor)
                         return if (ArgbHighlightSettings.getInstance().snapshot().enabled) {

@@ -16,6 +16,7 @@ dependencies {
     intellijPlatform {
         intellijIdea("2026.2.3")
         testFramework(TestFrameworkType.Platform)
+        testFramework(TestFrameworkType.Plugin.Java)
 
         // Add plugin dependencies for compilation here:
         bundledPlugin("com.intellij.java")

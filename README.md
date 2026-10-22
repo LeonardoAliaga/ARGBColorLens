@@ -4,13 +4,14 @@
 
 ARGB Color Lens adds a color swatch to the editor gutter for Java literals written as `0xAARRGGBB`, including references to `final` fields initialized with an ARGB literal. You can choose whether to change an individual usage or the original color definition.
 
-[![Version](https://img.shields.io/badge/version-0.4.2-blue)](https://github.com/LeonardoAliaga/ARGBColorLens)
+[![Version](https://img.shields.io/badge/version-0.4.3-blue)](https://github.com/LeonardoAliaga/ARGBColorLens)
 [![License](https://img.shields.io/badge/license-MIT-green)](LICENSE)
 [![IntelliJ](https://img.shields.io/badge/IntelliJ_Platform-2026.2%2B-7F52FF)](https://www.jetbrains.com/idea/)
 
 ## Features
 
 - **ARGB previews:** gutter swatches for `0xAARRGGBB` values in Java, including the alpha (transparency) channel.
+- **Single preview per expression:** redundant native swatches for a handled ARGB literal or its variable declaration are hidden; the plugin's hover and mouse actions remain available.
 - **Configurable hover highlighting:** optionally disable highlighting, select a custom highlight color, or match each color swatch automatically. Settings persist across IDE restarts.
 - **Context-sensitive tooltips:** with hover highlighting enabled, the tooltip stays short and shows only mouse-action hints, without hexadecimal values or source expressions. With highlighting disabled, it shows the ARGB value and the symbolic name for references such as `UiTheme.TEXT_PRIMARY`; literals are shown only once.
 - **Automatic localization:** English is the default; Spanish is used automatically when the IDE language is Spanish. Other languages fall back to English.
@@ -100,7 +101,7 @@ Test changes inside the **sandbox IDE** opened by `runIde` before installing the
 - **Tooltips:** con el resaltado activado solo muestran indicaciones breves de los clics. Al desactivar el resaltado vuelven a mostrar el ARGB y, si corresponde, la referencia como `UiTheme.TEXT_PRIMARY`, sin repetir los literales.
 - Se conserva la transparencia ARGB y se utiliza el selector de colores de IntelliJ.
 
-La versión **0.4.0** incorpora la configuración de resaltado y mejoras en los tooltips. La **0.3.0** incorporó el hover y la traducción inglés/español. Consulta [CHANGELOG.md](CHANGELOG.md) para conocer los cambios.
+La versión **0.4.3** evita los cuadros de color duplicados en literales y declaraciones, conservando las acciones del plugin. La **0.4.0** incorpora la configuración de resaltado y mejoras en los tooltips. Consulta [CHANGELOG.md](CHANGELOG.md) para conocer los cambios.
 
 ## Author and links
 
