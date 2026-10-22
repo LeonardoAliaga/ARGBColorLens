@@ -1,4 +1,5 @@
 import org.jetbrains.intellij.platform.gradle.TestFrameworkType
+import org.jetbrains.intellij.platform.gradle.tasks.PrepareSandboxTask
 import org.jetbrains.intellij.platform.gradle.tasks.VerifyPluginSignatureTask
 import java.util.Base64
 
@@ -12,6 +13,13 @@ tasks.test {
     testLogging {
         exceptionFormat = org.gradle.api.tasks.testing.logging.TestExceptionFormat.FULL
     }
+}
+
+// The unified IDEA distribution includes an Ultimate-only startup extension
+// that cannot be instantiated by light fixtures. ARGB tests require platform
+// and Java APIs only; keep this exclusion confined to the test sandbox.
+tasks.named<PrepareSandboxTask>("prepareTestSandbox") {
+    disabledPlugins.add("com.intellij.modules.ultimate")
 }
 
 // Read more: https://plugins.jetbrains.com/docs/intellij/tools-intellij-platform-gradle-plugin.html
